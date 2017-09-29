@@ -8,6 +8,11 @@ function resolve (dir) {
 }
 
 module.exports = {
+//   - configuration.node['fs'] should be one of these:
+//   false | true | "mock" | "empty"
+  node: {
+    fs: 'empty',
+  },
   entry: {
     app: './src/main.js'
   },
