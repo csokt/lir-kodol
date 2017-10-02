@@ -1,9 +1,14 @@
 <template>
-  <div class="teszt">
-    <h1>{{ msg }}</h1>
-    <div>{{ input }}</div>
-    <video class="kamera" id="preview"></video>
+  <div class="qrcode-reader">
+    <div>
+      <button v-on:click="activeCamera += 1" type="button">Váltás az előlapi és hátlapi kamera között</button>
+    </div>
+    <video class="camera" ref="preview"></video>
+    <div>
+      <input type="number" v-model="input" placeholder="Kézi adatbevitel"/>
+    </div>
   </div>
+
 </template>
 <!--
     <el-input placeholder="Please input" v-model="input"></el-input>
@@ -14,21 +19,64 @@ import Instascan from 'instascan-ngfar'
 // import Instascan from 'instascan'
 
 export default {
-  name: 'teszt',
+  props: {
+    active: {
+      type: Boolean,
+      default: true
+    },
+
+    // Whether to horizontally mirror the video preview.
+    mirror: {
+      type: Boolean,
+      default: true
+    },
+
+    // Whether to actively scan when the tab is not active.
+    backgroundScan: {
+      type: Boolean,
+      default: true
+    },
+
+    // The period, in milliseconds, before the same QR code will be recognized in succession.
+    refractoryPeriod: {
+      type: Number,
+      default: 5000
+    },
+
+    // Only applies to continuous mode. The period, in rendered frames, between scans.
+    scanPeriod: {
+      type: Number,
+      default: 10
+    },
+
+    // Default camera index, begins with 0.
+    defaultCamera: {
+      type: Number,
+      default: 0
+    }
+
+  },
+
   data () {
     return {
-      msg: 'Teszt App',
-      input: 'üres',
+      input: '',
       stillActive: true,
       readData: '',
       cameras: [],
-      activeCameraIndex: 1
+      activeCamera: 0
+    }
+  },
+
+  watch: {
+    activeCamera (newValue) {
+      console.log('activeCamera:', newValue)
     }
   },
 
   mounted () {
     let self = this
-    self.scanner = new Instascan.Scanner({ video: document.getElementById('preview'), scanPeriod: 5 })
+    let opts = { video: self.$refs.preview, mirror: self.mirror, backgroundScan: self.backgroundScan, refractoryPeriod: self.refractoryPeriod, scanPeriod: self.scanPeriod }
+    self.scanner = new Instascan.Scanner(opts)
 
     self.scanner.addListener('scan', function (content) {
       self.input = content
@@ -39,9 +87,9 @@ export default {
       console.log(cameras)
       self.cameras = cameras
       self.cameraCount = cameras.length
-      if (self.activeCameraIndex >= self.cameraCount) { self.activeCameraIndex = self.cameraCount - 1 }
+      if (self.activeCamera >= self.cameraCount) { self.activeCamera = self.cameraCount - 1 }
       if (self.cameraCount > 0) {
-        self.scanner.start(cameras[self.activeCameraIndex])
+        self.scanner.start(cameras[self.activeCamera])
       } else {
         console.error('No cameras found.')
       }

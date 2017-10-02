@@ -17,7 +17,6 @@
     "instascan": "^1.0.0",
     "instascan-ngfar": "^2.0.6",
     "vue": "^2.4.2",
-    "vue-qrcode-reader": "^0.1.1",
     "vue-router": "^2.7.0"
   },
   "devDependencies": {
