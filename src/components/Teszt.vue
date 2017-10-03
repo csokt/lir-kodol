@@ -1,18 +1,14 @@
 <template>
   <div class="qrcode-reader">
-    <div>
-      <button v-on:click="activeCamera += 1" type="button">Váltás az előlapi és hátlapi kamera között</button>
-    </div>
+    <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
+    <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button">Váltás az előlapi és hátlapi kamera között</button>
+    <br>
     <video class="camera" ref="preview"></video>
-    <div>
-      <input type="number" v-model="input" placeholder="Kézi adatbevitel"/>
-    </div>
+    <br>
+    {{ message }}
   </div>
 
 </template>
-<!--
-    <el-input placeholder="Please input" v-model="input"></el-input>
--->
 
 <script>
 import Instascan from 'instascan-ngfar'
@@ -20,9 +16,9 @@ import Instascan from 'instascan-ngfar'
 
 export default {
   props: {
-    active: {
-      type: Boolean,
-      default: true
+    message: {
+      type: String,
+      default: ''
     },
 
     // Whether to horizontally mirror the video preview.
@@ -60,16 +56,22 @@ export default {
   data () {
     return {
       input: '',
-      stillActive: true,
-      readData: '',
       cameras: [],
-      activeCamera: 0
+      cameraCount: 0,
+      activeCamera: -1
     }
   },
 
   watch: {
     activeCamera (newValue) {
-      console.log('activeCamera:', newValue)
+      if (this.cameraCount === 0) {
+        console.error('No cameras found.')
+      } else if (newValue < this.cameraCount) {
+        let camera = this.cameras[newValue]
+        this.scanner.start(camera)
+      } else {
+        this.activeCamera = 0
+      }
     }
   },
 
@@ -79,42 +81,26 @@ export default {
     self.scanner = new Instascan.Scanner(opts)
 
     self.scanner.addListener('scan', function (content) {
-      self.input = content
-      console.log(content)
+//      self.input = content
+      self.$emit('capture', content)
     })
 
     Instascan.Camera.getCameras().then(function (cameras) {
-      console.log(cameras)
       self.cameras = cameras
       self.cameraCount = cameras.length
-      if (self.activeCamera >= self.cameraCount) { self.activeCamera = self.cameraCount - 1 }
-      if (self.cameraCount > 0) {
-        self.scanner.start(cameras[self.activeCamera])
-      } else {
-        console.error('No cameras found.')
-      }
+      self.activeCamera = self.defaultCamera
     }).catch(function (e) {
       console.error(e)
     })
-
-    console.log('mounted')
   },
 
   beforeDestroy: function () {
     this.scanner.stop()
-    console.log('beforeDestroy')
   },
 
   methods: {
-    handleChange (value) {
-      console.log(value)
-    },
-
-    onCapture (payload) {
-      console.log(payload.result)
-      this.input = payload.result
-      this.readData = payload.result
-//      this.stillActive = false
+    submit () {
+      this.$emit('capture', this.input)
     }
 
   }
@@ -123,8 +109,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
 
 </style>
