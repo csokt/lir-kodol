@@ -21,10 +21,12 @@
 </template>
 
 <script>
+import store from '../store'
 export default {
   name: 'hello',
   data () {
     return {
+      store: store,
       msg: 'Welcome to Your Vue.js App'
     }
   }

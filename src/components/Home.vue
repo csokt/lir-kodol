@@ -1,24 +1,18 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
-    <qrcode-reader v-bind:mirror="false"></qrcode-reader>
+    <h2>Kezdőoldal</h2>
   </div>
 </template>
 
 <script>
 import store from '../store'
-import QrcodeReader from './QrcodeReader.vue'
-
 export default {
-  name: 'teszt',
+  name: 'hello',
   data () {
     return {
       store: store,
-      msg: 'Teszt'
+      msg: 'Welcome to Your Vue.js App'
     }
-  },
-  components: {
-    'qrcode-reader': QrcodeReader
   }
 }
 </script>
