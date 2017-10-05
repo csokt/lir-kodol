@@ -1,11 +1,13 @@
 <template>
   <div class="qrcode-reader">
-    <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
+  <h2> {{ head }} </h2>
     <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button">Váltás az előlapi és hátlapi kamera között</button>
     <br>
     <video class="camera" ref="preview"></video>
     <br>
-    {{ message }}
+    <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
+    <br>
+    {{message}}
   </div>
 
 </template>
@@ -16,6 +18,11 @@ import Instascan from 'instascan-ngfar'
 
 export default {
   props: {
+    head: {
+      type: String,
+      default: 'head'
+    },
+
     message: {
       type: String,
       default: ''
@@ -81,7 +88,7 @@ export default {
     self.scanner = new Instascan.Scanner(opts)
 
     self.scanner.addListener('scan', function (content) {
-//      self.input = content
+      self.input = content
       self.$emit('capture', content)
     })
 
@@ -100,7 +107,9 @@ export default {
 
   methods: {
     submit () {
-      this.$emit('capture', this.input)
+      if (this.input) {
+        this.$emit('capture', this.input)
+      }
     }
 
   }

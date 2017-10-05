@@ -1,13 +1,11 @@
 <template>
   <div>
     <h1>{{ msg }}</h1>
-    <qrcode-reader v-bind:mirror="false"></qrcode-reader>
   </div>
 </template>
 
 <script>
 import store from '../store'
-import QrcodeReader from './QrcodeReader.vue'
 
 export default {
   name: 'teszt',
@@ -18,7 +16,6 @@ export default {
     }
   },
   components: {
-    'qrcode-reader': QrcodeReader
   }
 }
 </script>

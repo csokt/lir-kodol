@@ -1,12 +1,20 @@
 <template>
-  <div>
+  <div class="container">
     <h3>Teljesítmény kódolás</h3>
     Felhasználó: <input type="text" v-model="store.user" readonly/>
     <div v-if="store.user">
       Gyártási hely: <input type="text" v-model="hely" readonly/>
       <br>
-      Dolgozó: <input type="text" v-model="dolgozo" readonly/>
+      Dolgozó: <input type="text" v-model="dolgozo"/>
+      <button @click="dolgozo=''; scandolgozo='true'" type="button">scan</button>
       <br>
+      <div class="modal" :class="{ 'is-active': scandolgozo }">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <qrcode-reader @capture="checkdolgozo" head="Dolgozó beolvasás" :message="qrmessage"></qrcode-reader>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+      </div>
       Gyártási lap: <input type="number" v-model="gyartasi_lap_id"/>
       <br>
       Műveletkód: <input type="number" v-model="szefo_muvelet_id"/>
@@ -18,15 +26,15 @@
       Kész db: <input type="number" v-model="kesz_db" readonly/>
       <br>
       Mennyiség: <input type="number" v-model="mennyiseg"/>
+      <br>
+      <button @click="$router.go(-1)" type="button">Vissza</button>
     </div>
     <div v-else>
-      <qrcode-reader @capture="login"></qrcode-reader>
+      <h1>Jelentkezzen be!</h1>
     </div>
   </div>
 </template>
 <!--
-    <qrcode-reader v-bind:mirror="false"></qrcode-reader>
-
     <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
 
 -->
@@ -47,16 +55,18 @@ export default {
       szefo_muvelet: null,
       osszes_db: null,
       kesz_db: null,
-      mennyiseg: null
+      mennyiseg: null,
+      scandolgozo: false,
+      qrmessage: ''
     }
   },
   components: {
     'qrcode-reader': QrcodeReader
   },
   methods: {
-    login (value) {
-      console.log('login:', value)
-      this.store.user = value
+    checkdolgozo (value) {
+      this.dolgozo = value
+      this.scandolgozo = false
     }
   }
 }
