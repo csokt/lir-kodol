@@ -1,21 +1,23 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
+    <span class="title">Teszt</span>
+    <qrcode-reader head="Teszt beolvasás" message="Teszt üzenet"></qrcode-reader>
   </div>
 </template>
 
 <script>
 import store from '../store'
+import QrcodeReader from './QrcodeReader.vue'
 
 export default {
   name: 'teszt',
   data () {
     return {
-      store: store,
-      msg: 'Teszt'
+      store: store
     }
   },
   components: {
+    'qrcode-reader': QrcodeReader
   }
 }
 </script>

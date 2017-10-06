@@ -1,15 +1,24 @@
 <template>
   <div>
-    <h1>Legrand Információs Rendszer</h1>
+    <span class="title">Legrand Információs Rendszer</span>
     <div v-if="store.user">
-      Üdvözölöm {{ store.user }}
+      <span class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user }} </span>
       <br>
-      <button @click="store.user=''" type="button">Kijelentkezés</button>
+      <button @click="store.user=''" type="button" class="button is-danger is-large">Kijelentkezés</button>
       <br>
-      <button @click="$router.push('kodol')" type="button">Kódolás</button>
+      <button @click="$router.push('kodol')" type="button" class="button is-info is-large">Kódolás</button>
     </div>
     <div v-else>
-      <qrcode-reader @capture="login" head="Bejelentkezés" :message="qrmessage"></qrcode-reader>
+      <button @click="scanUser=true" type="button" class="button is-danger is-large">Jelentkezzen be kódkártyájával!</button>
+
+      <div v-if="scanUser" class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <qrcode-reader @capture="checkUser" head="Bejelentkezés" :message="messageUser"></qrcode-reader>
+        </div>
+        <button @click="scanUser=false" class="modal-close is-large" aria-label="close"></button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -23,15 +32,17 @@ export default {
   data () {
     return {
       store: store,
-      qrmessage: ''
+      scanUser: false,
+      messageUser: ''
     }
   },
   components: {
     'qrcode-reader': QrcodeReader
   },
   methods: {
-    login (value) {
+    checkUser (value) {
       this.store.user = value
+      this.scanUser = false
     }
   }
 }

@@ -1,7 +1,8 @@
 <template>
   <div class="qrcode-reader">
-  <h2> {{ head }} </h2>
-    <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button">Váltás az előlapi és hátlapi kamera között</button>
+    <span class="is-size-3"> {{ head }} </span>
+    <br>
+    <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button" class="button is-info is-large">Váltás az előlapi és hátlapi kamera között</button>
     <br>
     <video class="camera" ref="preview"></video>
     <br>

@@ -1,46 +1,74 @@
 <template>
   <div class="container">
-    <h3>Teljesítmény kódolás</h3>
-    Felhasználó: <input type="text" v-model="store.user" readonly/>
+    <span class="is-size-4">Teljesítmény kódolás</span>
     <div v-if="store.user">
-      Gyártási hely: <input type="text" v-model="hely" readonly/>
-      <br>
-      Dolgozó: <input type="text" v-model="dolgozo"/>
-      <button @click="dolgozo=''; scandolgozo='true'" type="button">scan</button>
-      <br>
-      <div class="modal" :class="{ 'is-active': scandolgozo }">
+
+      <my-input label="Kódoló">
+        <input class="input" type="text" v-model="store.user" readonly>
+      </my-input>
+
+      <my-input label="Gyártási hely">
+        <input class="input" type="text" v-model="hely" readonly/>
+      </my-input>
+
+      <my-input label="Dolgozó">
+        <input class="input" type="text" v-model="dolgozo"/>
+      </my-input>
+
+      <my-input label="Gyártási lap">
+        <input class="input" type="number" v-model="gyartasi_lap_id"/>
+      </my-input>
+
+      <my-input label="Műveletkód">
+        <input class="input" type="number" v-model="szefo_muvelet_id"/>
+      </my-input>
+
+      <my-input label="Művelet">
+        <input class="input" type="text" v-model="szefo_muvelet" readonly/>
+      </my-input>
+
+      <my-input label="Összes db">
+        <input class="input" type="number" v-model="osszes_db" readonly/>
+      </my-input>
+
+      <my-input label="Kész db">
+        <input class="input" type="number" v-model="kesz_db" readonly/>
+      </my-input>
+
+      <my-input label="Mennyiség">
+        <input class="input" type="number" v-model="mennyiseg"/>
+      </my-input>
+
+      <my-input>
+        <button @click="scanDolgozo=true" type="button" class="button">Dolgozó QR-kód</button>
+        <button class="button is-primary"> Send message </button>
+        <button @click="$router.go(-1)" type="button" class="button">Vissza</button>
+      </my-input>
+
+
+      <div v-if="scanDolgozo" class="modal is-active">
         <div class="modal-background"></div>
         <div class="modal-content">
-          <qrcode-reader @capture="checkdolgozo" head="Dolgozó beolvasás" :message="qrmessage"></qrcode-reader>
+          <qrcode-reader @capture="checkDolgozo" head="Dolgozó beolvasás" :message="messageDolgozo"></qrcode-reader>
         </div>
-        <button class="modal-close is-large" aria-label="close"></button>
+        <button @click="scanDolgozo=false" class="modal-close is-large" aria-label="close"></button>
       </div>
-      Gyártási lap: <input type="number" v-model="gyartasi_lap_id"/>
-      <br>
-      Műveletkód: <input type="number" v-model="szefo_muvelet_id"/>
-      <br>
-      Művelet: <input type="text" v-model="szefo_muvelet" readonly/>
-      <br>
-      Összes db: <input type="number" v-model="osszes_db" readonly/>
-      <br>
-      Kész db: <input type="number" v-model="kesz_db" readonly/>
-      <br>
-      Mennyiség: <input type="number" v-model="mennyiseg"/>
-      <br>
-      <button @click="$router.go(-1)" type="button">Vissza</button>
     </div>
     <div v-else>
-      <h1>Jelentkezzen be!</h1>
+      <button @click="$router.push('/')" type="button">Jelentkezzen be!</button>
     </div>
   </div>
 </template>
 <!--
+      <h1 @click="$router.push('/')">Jelentkezzen be!</h1>
+
     <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
 
 -->
 
 <script>
 import store from '../store'
+import Input from './Input.vue'
 import QrcodeReader from './QrcodeReader.vue'
 
 export default {
@@ -56,17 +84,18 @@ export default {
       osszes_db: null,
       kesz_db: null,
       mennyiseg: null,
-      scandolgozo: false,
-      qrmessage: ''
+      scanDolgozo: false,
+      messageDolgozo: ''
     }
   },
   components: {
+    'my-input': Input,
     'qrcode-reader': QrcodeReader
   },
   methods: {
-    checkdolgozo (value) {
+    checkDolgozo (value) {
       this.dolgozo = value
-      this.scandolgozo = false
+      this.scanDolgozo = false
     }
   }
 }

@@ -29,4 +29,8 @@ export default {
   color: #2c3e50;
   margin-top: 0px;
 }
+
+.button {
+  margin: 0.5em;
+}
 </style>
