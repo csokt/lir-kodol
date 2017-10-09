@@ -2,9 +2,9 @@
   <div>
     <span class="title">Legrand Információs Rendszer</span>
     <div v-if="store.user">
-      <span class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user }} </span>
+      <span class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user.name }} </span>
       <br>
-      <button @click="store.user=''" type="button" class="button is-danger is-large">Kijelentkezés</button>
+      <button @click="store.user=null" type="button" class="button is-danger is-large">Kijelentkezés</button>
       <br>
       <button @click="$router.push('kodol')" type="button" class="button is-info is-large">Kódolás</button>
     </div>
@@ -25,6 +25,7 @@
 
 <script>
 import store from '../store'
+import {HTTP} from '../http-common'
 import QrcodeReader from './QrcodeReader.vue'
 
 export default {
@@ -41,8 +42,18 @@ export default {
   },
   methods: {
     checkUser (value) {
-      this.store.user = value
-      this.scanUser = false
+      HTTP.get(`legrand_lir_user?limit=1&qr=eq.` + value)
+      .then(response => {
+        if (response.data.length) {
+          this.store.user = response.data[0]
+          this.scanUser = false
+        } else {
+          this.messageUser = 'Érvénytelen felhasználó kód!'
+        }
+      })
+      .catch(e => {
+        this.messageUser = e
+      })
     }
   }
 }

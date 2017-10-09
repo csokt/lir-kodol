@@ -3,36 +3,12 @@
     <span class="is-size-4">Teljesítmény kódolás</span>
     <div v-if="store.user">
 
-      <my-input label="Kódoló">
-        <input class="input" type="text" v-model="store.user" readonly>
-      </my-input>
-
-      <my-input label="Gyártási hely">
-        <input class="input" type="text" v-model="hely" readonly/>
-      </my-input>
-
-      <my-input label="Dolgozó">
-        <input class="input" type="text" v-model="dolgozo"/>
-      </my-input>
-
-      <my-input label="Gyártási lap">
-        <input class="input" type="number" v-model="gyartasi_lap_id"/>
+      <my-input label="Gyártási lap sorszám">
+        <input v-on:blur="checkGyartasiLap" class="input" type="number" v-model="gyartasi_lap_id"/>
       </my-input>
 
       <my-input label="Műveletkód">
-        <input class="input" type="number" v-model="szefo_muvelet_id"/>
-      </my-input>
-
-      <my-input label="Művelet">
-        <input class="input" type="text" v-model="szefo_muvelet" readonly/>
-      </my-input>
-
-      <my-input label="Összes db">
-        <input class="input" type="number" v-model="osszes_db" readonly/>
-      </my-input>
-
-      <my-input label="Kész db">
-        <input class="input" type="number" v-model="kesz_db" readonly/>
+        <input v-on:blur="checkMuvelet" class="input" type="number" v-model="muveletszam"/>
       </my-input>
 
       <my-input label="Mennyiség">
@@ -45,8 +21,35 @@
         <button @click="$router.go(-1)" type="button" class="button">Vissza</button>
       </my-input>
 
+      <my-input label="Kódoló">
+        <input class="input" type="text" v-model="store.user.name" readonly>
+      </my-input>
 
-      <div v-if="scanDolgozo" class="modal is-active">
+      <my-input label="Gyártási hely">
+        <input class="input" type="text" v-model="store.user.hely" readonly/>
+      </my-input>
+
+      <my-input v-if="store.dolgozo" label="Dolgozó">
+        <input class="input" type="text" v-model="store.dolgozo.name" readonly/>
+      </my-input>
+
+      <my-input v-if="store.gyartasi_lap" label="Gyártási lap">
+        <input class="input" type="text" v-model="store.gyartasi_lap.name" readonly/>
+      </my-input>
+
+      <my-input v-if="store.gylap_szefo_muvelet" label="Művelet">
+        <input class="input" type="text" v-model="store.gylap_szefo_muvelet.name" readonly/>
+      </my-input>
+
+      <my-input v-if="store.gylap_szefo_muvelet" label="Összes db">
+        <input class="input" type="number" v-model="store.gylap_szefo_muvelet.osszes_db" readonly/>
+      </my-input>
+
+      <my-input v-if="store.gylap_szefo_muvelet" label="Kész db">
+        <input class="input" type="number" v-model="store.gylap_szefo_muvelet.kesz_db" readonly/>
+      </my-input>
+
+      <div v-if="scanDolgozo || !store.dolgozo" class="modal is-active">
         <div class="modal-background"></div>
         <div class="modal-content">
           <qrcode-reader @capture="checkDolgozo" head="Dolgozó beolvasás" :message="messageDolgozo"></qrcode-reader>
@@ -68,6 +71,7 @@
 
 <script>
 import store from '../store'
+import {HTTP} from '../http-common'
 import Input from './Input.vue'
 import QrcodeReader from './QrcodeReader.vue'
 
@@ -76,13 +80,8 @@ export default {
   data () {
     return {
       store: store,
-      hely: null,
-      dolgozo: null,
       gyartasi_lap_id: null,
-      szefo_muvelet_id: null,
-      szefo_muvelet: null,
-      osszes_db: null,
-      kesz_db: null,
+      muveletszam: null,
       mennyiseg: null,
       scanDolgozo: false,
       messageDolgozo: ''
@@ -94,10 +93,53 @@ export default {
   },
   methods: {
     checkDolgozo (value) {
-      this.dolgozo = value
-      this.scanDolgozo = false
+      HTTP.get(`nexon_szemely?limit=1&active&SzemelyId=eq.` + value)
+      .then(response => {
+        if (response.data.length) {
+          this.store.dolgozo = response.data[0]
+          this.scanDolgozo = false
+        } else {
+          this.messageDolgozo = 'Érvénytelen dolgozó kód!'
+        }
+      })
+      .catch(e => {
+        this.messageDolgozo = e
+      })
+    },
+
+    checkGyartasiLap () {
+      this.store.gyartasi_lap = null
+      if (this.gyartasi_lap_id) {
+        HTTP.get(`legrand_gyartasi_lap?limit=1&active&id=eq.` + this.gyartasi_lap_id)
+        .then(response => {
+          if (response.data.length) {
+            console.log(response.data[0])
+            this.store.gyartasi_lap = response.data[0]
+          }
+        })
+        .catch(e => {
+        })
+      }
+    },
+
+    checkMuvelet () {
+      this.store.gylap_szefo_muvelet = null
+      if (this.muveletszam) {
+        console.log(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.muveletszam)
+        HTTP.get(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.muveletszam)
+        .then(response => {
+          if (response.data.length) {
+            console.log(response.data[0])
+            this.store.gylap_szefo_muvelet = response.data[0]
+          }
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      }
     }
   }
+
 }
 </script>
 
