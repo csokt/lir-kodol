@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <span class="title">Legrand Információs Rendszer</span>
+  <div class="box">
+    <div class="title">Legrand Információs Rendszer</div>
     <div v-if="store.user">
-      <span class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user.name }} </span>
+      <div class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user.name }} </div>
       <br>
       <button @click="store.user=null" type="button" class="button is-danger is-large">Kijelentkezés</button>
       <br>
@@ -61,5 +61,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.button {
+  margin: 0.5em;
+}
 </style>

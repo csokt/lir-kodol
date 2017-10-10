@@ -1,53 +1,73 @@
 <template>
-  <div class="container">
-    <span class="is-size-4">Teljesítmény kódolás</span>
+  <div class="box is-size-4">
+    <div class="is-size-2">Teljesítmény kódolás</div>
+    <br>
     <div v-if="store.user">
 
-      <my-input label="Gyártási lap sorszám">
-        <input v-on:blur="checkGyartasiLap" class="input" type="number" v-model="gyartasi_lap_id"/>
-      </my-input>
+      <div class="columns is-variable is-8">
+        <div class="column is-one-quarter">
 
-      <my-input label="Műveletkód">
-        <input v-on:blur="checkMuvelet" class="input" type="number" v-model="muveletszam"/>
-      </my-input>
+          <my-input label="Gyártási lap">
+            <input v-on:change="checkGyartasiLap" class="input is-large" type="number" v-model="store.gyartasi_lap_id"/>
+          </my-input>
 
-      <my-input label="Mennyiség">
-        <input class="input" type="number" v-model="mennyiseg"/>
-      </my-input>
+          <my-input label="Műveletkód">
+            <input v-on:change="checkMuvelet" class="input is-large" type="number" v-model="store.muveletszam"/>
+          </my-input>
 
-      <my-input>
-        <button @click="scanDolgozo=true" type="button" class="button">Dolgozó QR-kód</button>
-        <button class="button is-primary"> Send message </button>
-        <button @click="$router.go(-1)" type="button" class="button">Vissza</button>
-      </my-input>
+          <my-input label="Mennyiség">
+            <input class="input is-large" type="number" v-model="mennyiseg"/>
+          </my-input>
 
-      <my-input label="Kódoló">
-        <input class="input" type="text" v-model="store.user.name" readonly>
-      </my-input>
+          <button v-if="store.gyartasi_lap && store.gylap_szefo_muvelet && mennyiseg" class="button is-info is-large">Mentés</button>
 
-      <my-input label="Gyártási hely">
-        <input class="input" type="text" v-model="store.user.hely" readonly/>
-      </my-input>
+        </div>
 
-      <my-input v-if="store.dolgozo" label="Dolgozó">
-        <input class="input" type="text" v-model="store.dolgozo.name" readonly/>
-      </my-input>
+        <div class="column">
+          <br>
+          <table class="table is-bordered">
+            <tbody>
+              <tr>
+                <th>Kódoló</th>
+                <td>{{store.user.name}}</td>
+              </tr>
 
-      <my-input v-if="store.gyartasi_lap" label="Gyártási lap">
-        <input class="input" type="text" v-model="store.gyartasi_lap.name" readonly/>
-      </my-input>
+              <tr>
+                <th>Gyártási hely</th>
+                <td>{{store.user.hely}}</td>
+              </tr>
 
-      <my-input v-if="store.gylap_szefo_muvelet" label="Művelet">
-        <input class="input" type="text" v-model="store.gylap_szefo_muvelet.name" readonly/>
-      </my-input>
+              <tr v-if="store.dolgozo">
+                <th>Dolgozó</th>
+                <td>{{store.dolgozo.name}}</td>
+              </tr>
 
-      <my-input v-if="store.gylap_szefo_muvelet" label="Összes db">
-        <input class="input" type="number" v-model="store.gylap_szefo_muvelet.osszes_db" readonly/>
-      </my-input>
+              <tr v-if="store.gyartasi_lap">
+                <th>Gyártási lap</th>
+                <td>{{store.gyartasi_lap.name}}</td>
+              </tr>
 
-      <my-input v-if="store.gylap_szefo_muvelet" label="Kész db">
-        <input class="input" type="number" v-model="store.gylap_szefo_muvelet.kesz_db" readonly/>
-      </my-input>
+              <tr v-if="store.gylap_szefo_muvelet">
+                <th>Művelet</th>
+                <td>{{store.gylap_szefo_muvelet.name}}</td>
+              </tr>
+
+              <tr v-if="store.gylap_szefo_muvelet">
+                <th>Összes db</th>
+                <td>{{store.gylap_szefo_muvelet.osszes_db}}</td>
+              </tr>
+
+              <tr v-if="store.gylap_szefo_muvelet">
+                <th>Kész db</th>
+                <td>{{store.gylap_szefo_muvelet.kesz_db}}</td>
+              </tr>
+
+            </tbody>
+          </table>
+          <button @click="scanDolgozo=true" type="button" class="button is-danger is-large">Új dolgozó</button>
+          <button @click="$router.go(-1)" type="button" class="button is-dark is-large">Vissza</button>
+        </div>
+      </div>
 
       <div v-if="scanDolgozo || !store.dolgozo" class="modal is-active">
         <div class="modal-background"></div>
@@ -80,8 +100,6 @@ export default {
   data () {
     return {
       store: store,
-      gyartasi_lap_id: null,
-      muveletszam: null,
       mennyiseg: null,
       scanDolgozo: false,
       messageDolgozo: ''
@@ -109,8 +127,11 @@ export default {
 
     checkGyartasiLap () {
       this.store.gyartasi_lap = null
-      if (this.gyartasi_lap_id) {
-        HTTP.get(`legrand_gyartasi_lap?limit=1&active&id=eq.` + this.gyartasi_lap_id)
+      this.store.muveletszam = null
+      this.store.gylap_szefo_muvelet = null
+      this.mennyiseg = null
+      if (this.store.gyartasi_lap_id) {
+        HTTP.get(`legrand_gyartasi_lap?limit=1&active&id=eq.` + this.store.gyartasi_lap_id)
         .then(response => {
           if (response.data.length) {
             console.log(response.data[0])
@@ -124,9 +145,10 @@ export default {
 
     checkMuvelet () {
       this.store.gylap_szefo_muvelet = null
-      if (this.muveletszam) {
-        console.log(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.muveletszam)
-        HTTP.get(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.muveletszam)
+      this.mennyiseg = null
+      if (this.store.muveletszam) {
+        console.log(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.store.muveletszam)
+        HTTP.get(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.store.muveletszam)
         .then(response => {
           if (response.data.length) {
             console.log(response.data[0])
@@ -145,6 +167,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.button {
+  margin: 0.5em;
+}
+.scan-qr-style {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
 </style>
 
