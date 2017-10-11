@@ -1,14 +1,12 @@
 <template>
   <div class="box">
-    <span class="is-size-3"> {{ head }} </span>
-    <br>
-    <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button" class="button is-info is-large">Váltás az előlapi és hátlapi kamera között</button>
-    <br>
+    <div class="is-size-3"> {{ head }} </div>
+    <button v-if="cameraCount > 1" @click="activeCamera += 1" type="button" class="button is-info is-large is-fullwidth">Váltás az előlapi és hátlapi kamera között</button>
     <video class="camera" ref="preview"></video>
-    <br>
-    <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
-    <br>
-    {{message}}
+    <div class="control">
+      <input class="input is-large" type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
+    </div>
+    <div class="is-size-4 has-text-danger">{{message}}</div>
   </div>
 
 </template>
@@ -119,5 +117,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.button {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
 
 </style>

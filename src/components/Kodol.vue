@@ -19,7 +19,7 @@
             <input class="input is-large" type="number" v-model="mennyiseg"/>
           </my-input>
 
-          <button v-if="store.gyartasi_lap && store.gylap_szefo_muvelet && mennyiseg" class="button is-info is-large">Mentés</button>
+          <button v-if="store.gyartasi_lap && store.gylap_szefo_muvelet && mennyiseg" @click="createMuveletvegzes" class="button is-info is-large">Mentés</button>
 
         </div>
 
@@ -64,10 +64,31 @@
 
             </tbody>
           </table>
-          <button @click="scanDolgozo=true" type="button" class="button is-danger is-large">Új dolgozó</button>
+          <button @click="scanDolgozo=true; messageDolgozo=''" type="button" class="button is-danger is-large">Új dolgozó</button>
           <button @click="$router.go(-1)" type="button" class="button is-dark is-large">Vissza</button>
         </div>
       </div>
+
+      <div class="has-text-danger">{{message}}</div>
+
+      <table class="table is-bordered is-size-5">
+        <thead>
+          <tr>
+            <th>Művelet</th>
+            <th>Dolgozó</th>
+            <th class="has-text-right">Menny.</th>
+            <th>Létrehozás ideje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in muveletvegzes">
+            <td>{{row.muvelet.name}}</td>
+            <td>{{row.dolgozo.name}}</td>
+            <td class="has-text-right">{{row.mennyiseg}}</td>
+            <td>{{utc2local(row.create_date)}}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <div v-if="scanDolgozo || !store.dolgozo" class="modal is-active">
         <div class="modal-background"></div>
@@ -84,9 +105,6 @@
 </template>
 <!--
       <h1 @click="$router.push('/')">Jelentkezzen be!</h1>
-
-    <input type="number" @keyup.enter="submit" v-model="input" placeholder="Kézi adatbevitel"/>
-
 -->
 
 <script>
@@ -100,6 +118,8 @@ export default {
   data () {
     return {
       store: store,
+      message: '',
+      muveletvegzes: [],
       mennyiseg: null,
       scanDolgozo: false,
       messageDolgozo: ''
@@ -109,7 +129,35 @@ export default {
     'my-input': Input,
     'qrcode-reader': QrcodeReader
   },
+
+  created: function () {
+    this.selectMuveletvegzes()
+  },
+
   methods: {
+    utc2local (utc) {
+      return new Date(utc + 'Z').toLocaleString()
+    },
+
+    createMuveletvegzes () {
+      this.selectMuveletvegzes()
+    },
+
+    selectMuveletvegzes () {
+      console.log(store.user)
+      HTTP.get(`legrand_muveletvegzes?select=mennyiseg,create_date,muvelet:legrand_gylap_szefo_muvelet(id,name),dolgozo:nexon_szemely(id,name)&order=id.desc&limit=5&create_uid=eq.` + store.user.user_id)
+      .then(response => {
+        if (response.data.length) {
+          this.muveletvegzes = response.data
+        } else {
+        }
+      })
+      .catch(e => {
+        this.message = e.message
+        console.log(e.response)
+      })
+    },
+
     checkDolgozo (value) {
       HTTP.get(`nexon_szemely?limit=1&active&SzemelyId=eq.` + value)
       .then(response => {
@@ -121,7 +169,8 @@ export default {
         }
       })
       .catch(e => {
-        this.messageDolgozo = e
+        this.messageDolgozo = e.message
+        console.log(e.response)
       })
     },
 
@@ -134,11 +183,12 @@ export default {
         HTTP.get(`legrand_gyartasi_lap?limit=1&active&id=eq.` + this.store.gyartasi_lap_id)
         .then(response => {
           if (response.data.length) {
-            console.log(response.data[0])
             this.store.gyartasi_lap = response.data[0]
           }
         })
         .catch(e => {
+          this.message = e.message
+          console.log(e.response)
         })
       }
     },
@@ -147,16 +197,15 @@ export default {
       this.store.gylap_szefo_muvelet = null
       this.mennyiseg = null
       if (this.store.muveletszam) {
-        console.log(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.store.muveletszam)
         HTTP.get(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + store.gyartasi_lap.id + `&muveletszam=eq.` + this.store.muveletszam)
         .then(response => {
           if (response.data.length) {
-            console.log(response.data[0])
             this.store.gylap_szefo_muvelet = response.data[0]
           }
         })
         .catch(e => {
-          console.log(e)
+          this.message = e.message
+          console.log(e.response)
         })
       }
     }
