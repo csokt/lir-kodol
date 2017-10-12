@@ -4,8 +4,8 @@
     <br>
     <div v-if="store.user">
 
-      <div class="columns is-variable is-8">
-        <div class="column is-one-quarter">
+      <div class="tile is-ancestor tile-margin">
+        <div class="tile is-child is-3">
 
           <my-input label="Gyártási lap">
             <input v-on:change="checkGyartasiLap" class="input is-large" type="number" v-model="store.gyartasi_lap_id"/>
@@ -23,7 +23,10 @@
 
         </div>
 
-        <div class="column">
+        <div class="tile is-child is-1">
+        </div>
+
+        <div class="tile is-child">
           <br>
           <table class="table is-bordered">
             <tbody>
@@ -258,14 +261,8 @@ export default {
 .button {
   margin: 0.5em;
 }
-.scan-qr-style {
-  background-color: red;
-  color: white;
-  font-weight: bold;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+.tile-margin {
+  margin: 0px;
 }
 </style>
 

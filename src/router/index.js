@@ -4,7 +4,6 @@ import Router from 'vue-router'
 import 'bulma/css/bulma.css'
 
 import Home from '@/components/Home'
-import Hello from '@/components/Hello'
 import Kodol from '@/components/Kodol'
 import Teszt from '@/components/Teszt'
 
@@ -16,11 +15,6 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home
-    },
-    {
-      path: '/hello',
-      name: 'Hello',
-      component: Hello
     },
     {
       path: '/kodol',
