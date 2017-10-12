@@ -1,17 +1,26 @@
 <template>
   <div>
-    Axios
-    <br>
-    <ul v-if="errors && errors.length">
-      <li v-for="error of errors">
-        {{error.message}}
-      </li>
-    </ul>
+    Teszt
+
+    <div class="columns">
+      <div class="column">
+        First column
+      </div>
+      <div class="column">
+        Second column
+      </div>
+      <div class="column">
+        Third column
+      </div>
+      <div class="column">
+        Fourth column
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-import {HTTP} from '../http-common'
 
 export default {
   data () {
@@ -19,20 +28,20 @@ export default {
       lirUsers: [],
       errors: []
     }
-  },
+  }
 
   // Fetches lirUsers when the component is created.
-  created () {
-    HTTP.get(`legrand_lir_user`)
-    .then(response => {
-      // JSON responses are automatically parsed.
-      console.log('response:', response.data)
-      this.lirUsers = response.data
-    })
-    .catch(e => {
-      this.errors.push(e)
-    })
-  }
+//  created () {
+//    HTTP.get(`legrand_lir_user`)
+//    .then(response => {
+//      // JSON responses are automatically parsed.
+//      console.log('response:', response.data)
+//      this.lirUsers = response.data
+//    })
+//    .catch(e => {
+//      this.errors.push(e)
+//    })
+//  }
 
   //  async / await version (created() becomes async created())
 //  async created () {

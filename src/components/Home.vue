@@ -1,5 +1,5 @@
 <template>
-  <div class="box">
+  <div>
     <div class="title">Legrand Információs Rendszer</div>
     <div v-if="store.user">
       <div class="is-size-4 has-text-danger"> Üdvözlöm {{ store.user.name }} </div>
