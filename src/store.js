@@ -1,10 +1,29 @@
+import odoo from './odoo-jsonrpc'
+
 var store = {
   user: null,
   dolgozo: null,
   gyartasi_lap_id: null,
   muveletszam: null,
   gyartasi_lap: null,
-  gylap_szefo_muvelet: null
+  gylap_szefo_muvelet: null,
+  odooConnected: false,
+  odooError: 'Kapcsolódás...'
 }
 
-export default store
+odoo.setHost('localhost:1337/localhost:8069')
+
+odoo.login('raktar', 'hegedus.istvan', 'Godhak04').then(
+  function (result) {
+    store.odooConnected = true
+    store.odooError = ''
+    console.log('You are logged !')
+    console.log('Your UID is : ' + result.uid)
+  },
+  function (error) {
+    store.odooError = 'Nincs kapcsolat az adatbázissal!'
+    console.error(error)
+  }
+)
+// export default store
+export {store, odoo}

@@ -9,7 +9,8 @@
       <button @click="$router.push('kodol')" type="button" class="button is-info is-large">Kódolás</button>
     </div>
     <div v-else>
-      <button @click="scanUser=true" type="button" class="button is-danger is-large">Jelentkezzen be kódkártyájával!</button>
+      <button v-if="store.odooConnected" @click="scanUser=true" type="button" class="button is-danger is-large">Jelentkezzen be kódkártyájával!</button>
+      <div class="is-size-4 has-text-danger"> {{ store.odooError }} </div>
 
       <div v-if="scanUser" class="modal is-active">
         <div class="modal-background"></div>
@@ -24,8 +25,8 @@
 </template>
 
 <script>
-import store from '../store'
-import {HTTP} from '../http-common'
+import {store, odoo} from '../store'
+// import {HTTP} from '../http-common'
 import QrcodeReader from './QrcodeReader.vue'
 
 export default {
@@ -41,19 +42,31 @@ export default {
     'qrcode-reader': QrcodeReader
   },
   methods: {
-    checkUser (value) {
-      HTTP.get(`legrand_lir_user?limit=1&qr=eq.` + value)
-      .then(response => {
-        if (response.data.length) {
-          this.store.user = response.data[0]
+    async checkUser (value) {
+      try {
+        let result = await odoo.model.searchRead('legrand.lir_user', [['qr', '=', value]], [])
+        if (result.length) {
+          this.store.user = result.records[0]
           this.scanUser = false
         } else {
           this.messageUser = 'Érvénytelen felhasználó kód!'
         }
-      })
-      .catch(e => {
-        this.messageUser = e
-      })
+      } catch (e) {
+        this.messageUser = e.message
+        console.log(e)
+      }
+//      HTTP.get(`legrand_lir_user?limit=1&qr=eq.` + value)
+//      .then(response => {
+//        if (response.data.length) {
+//          this.store.user = response.data[0]
+//          this.scanUser = false
+//        } else {
+//          this.messageUser = 'Érvénytelen felhasználó kód!'
+//        }
+//      })
+//      .catch(e => {
+//        this.messageUser = e
+//      })
     }
   }
 }
