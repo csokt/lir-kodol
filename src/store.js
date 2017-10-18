@@ -1,5 +1,8 @@
-import odoo from './odoo-jsonrpc'
-
+// /////////////////////////////////////////////////////////////////////////
+//
+//                              store
+//
+// /////////////////////////////////////////////////////////////////////////
 var store = {
   user: null,
   dolgozo: null,
@@ -10,6 +13,13 @@ var store = {
   odooConnected: false,
   odooError: 'Kapcsolódás...'
 }
+
+// /////////////////////////////////////////////////////////////////////////
+//
+//                               odoo
+//
+// /////////////////////////////////////////////////////////////////////////
+import odoo from './odoo-jsonrpc'
 
 odoo.setHost('localhost:1337/localhost:8069')
 
@@ -25,5 +35,17 @@ odoo.login('raktar', 'hegedus.istvan', 'Godhak04').then(
     console.error(error)
   }
 )
-// export default store
 export {store, odoo}
+
+// /////////////////////////////////////////////////////////////////////////
+//
+//                              axios
+//
+// /////////////////////////////////////////////////////////////////////////
+// import axios from 'axios'
+//
+// export const HTTP = axios.create({
+//   baseURL: `http://raktar.szefo.local:3000/`,
+//   headers: {
+//   }
+// })

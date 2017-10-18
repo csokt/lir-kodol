@@ -281,18 +281,14 @@ var odooJsonrpc = (function () {
   exposed.model.find = function (model, id, fields) {
     return new Promise(function (resolve, reject) {
       let domain = [['id', '=', id]]
-      if (undefined === fields) {
-        fields = []
-      }
 
       exposed.model.searchRead(model, domain, fields).then(
         function (result) {
-          if (result.length === 0) {
-            reject(Error('No result found'))
-            return
+          if (result.length) {
+            resolve(result.records[0])
+          } else {
+            resolve(null)
           }
-
-          resolve(result.records[0])
         },
         function (error) {
           reject(error)

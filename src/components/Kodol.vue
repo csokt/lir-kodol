@@ -85,7 +85,7 @@
         </thead>
         <tbody>
           <tr v-for="row in muveletvegzes">
-            <td>{{row.muveletnev}}</td>
+            <td>{{row.szefo_muvelet_id[1]}}</td>
             <td>{{row.szemely_id[1]}}</td>
             <td class="has-text-right">{{row.mennyiseg}}</td>
             <td>{{utc2local(row.create_date)}}</td>
@@ -113,7 +113,6 @@
 
 <script>
 import {store, odoo} from '../store'
-import {HTTP} from '../http-common'
 import Input from './Input.vue'
 import QrcodeReader from './QrcodeReader.vue'
 
@@ -146,70 +145,70 @@ export default {
     },
 
     async createMuveletvegzes () {
-      const row = {
-        szefo_muvelet_id: this.store.gylap_szefo_muvelet.id,
-        hely_id: this.store.user.hely_id[0],
-        szemely_id: this.store.dolgozo.id,
-        mennyiseg: this.mennyiseg,
-        megjegyzes: 'lir',
-        nexon_azon: this.store.dolgozo.SzemelyId,
-        felvette_id: this.store.user.user_id[0]
-      }
-      console.log(this.store.dolgozo)
-      console.log(row)
-      try {
-        let result = await odoo.model.create('legrand.muveletvegzes', row)
-        console.log(result)
-      } catch (e) {
-        this.message = e.message
-        console.log(e)
-      }
-      if (row) {
-        return
-      }
       try {
         this.message = null
-        this.mennyiseg = parseInt(this.mennyiseg)
-        const teljesitettOra = (this.store.gylap_szefo_muvelet.osszes_ido + this.store.gylap_szefo_muvelet.beall_ido) * this.mennyiseg / this.store.gylap_szefo_muvelet.osszes_db
-        await HTTP.post(`legrand_muveletvegzes`, {
+        const row = {
           szefo_muvelet_id: this.store.gylap_szefo_muvelet.id,
-          hely_id: this.store.user.hely_id,
+          hely_id: this.store.user.hely_id[0],
           szemely_id: this.store.dolgozo.id,
           mennyiseg: this.mennyiseg,
-          teljesitett_ora: teljesitettOra,
           megjegyzes: 'lir',
           nexon_azon: this.store.dolgozo.SzemelyId,
-          create_uid: this.store.user.user_id,
-          write_uid: this.store.user.user_id,
-          create_date: new Date(),
-          write_date: new Date()
-        })
-        const response = await HTTP.get(`legrand_gylap_szefo_muvelet?id=eq.` + this.store.gylap_szefo_muvelet.id)
-        this.store.gylap_szefo_muvelet = response.data[0]
-        let muvelet = this.store.gylap_szefo_muvelet
-        muvelet.kesz_db += this.mennyiseg
-        muvelet.elter_db += this.mennyiseg
-        muvelet.kesz_ora += teljesitettOra
-        muvelet.elter_ora += teljesitettOra
-        await HTTP.patch(`legrand_gylap_szefo_muvelet?id=eq.` + muvelet.id, {
-          kesz_db: muvelet.kesz_db,
-          elter_db: muvelet.elter_db,
-          kesz_ora: muvelet.kesz_ora,
-          elter_ora: muvelet.elter_ora
-        })
+          felvette_id: this.store.user.user_id[0]
+        }
+        await odoo.model.create('legrand.muveletvegzes', row)
         this.selectMuveletvegzes()
         this.store.muveletszam = null
         this.store.gylap_szefo_muvelet = null
         this.mennyiseg = null
       } catch (e) {
         this.message = e.message
-        console.log(e.response)
+        console.log(e)
       }
+//      try {
+//        this.message = null
+//        this.mennyiseg = parseInt(this.mennyiseg)
+//        const teljesitettOra = (this.store.gylap_szefo_muvelet.osszes_ido + this.store.gylap_szefo_muvelet.beall_ido) * this.mennyiseg / this.store.gylap_szefo_muvelet.osszes_db
+//        await HTTP.post(`legrand_muveletvegzes`, {
+//          szefo_muvelet_id: this.store.gylap_szefo_muvelet.id,
+//          hely_id: this.store.user.hely_id,
+//          szemely_id: this.store.dolgozo.id,
+//          mennyiseg: this.mennyiseg,
+//          teljesitett_ora: teljesitettOra,
+//          megjegyzes: 'lir',
+//          nexon_azon: this.store.dolgozo.SzemelyId,
+//          create_uid: this.store.user.user_id,
+//          write_uid: this.store.user.user_id,
+//          create_date: new Date(),
+//          write_date: new Date()
+//        })
+//        const response = await HTTP.get(`legrand_gylap_szefo_muvelet?id=eq.` + this.store.gylap_szefo_muvelet.id)
+//        this.store.gylap_szefo_muvelet = response.data[0]
+//        let muvelet = this.store.gylap_szefo_muvelet
+//        muvelet.kesz_db += this.mennyiseg
+//        muvelet.elter_db += this.mennyiseg
+//        muvelet.kesz_ora += teljesitettOra
+//        muvelet.elter_ora += teljesitettOra
+//        await HTTP.patch(`legrand_gylap_szefo_muvelet?id=eq.` + muvelet.id, {
+//          kesz_db: muvelet.kesz_db,
+//          elter_db: muvelet.elter_db,
+//          kesz_ora: muvelet.kesz_ora,
+//          elter_ora: muvelet.elter_ora
+//        })
+//        this.selectMuveletvegzes()
+//        this.store.muveletszam = null
+//        this.store.gylap_szefo_muvelet = null
+//        this.mennyiseg = null
+//      } catch (e) {
+//        this.message = e.message
+//        console.log(e.response)
+//      }
     },
 
     async selectMuveletvegzes () {
       try {
-        let result = await odoo.model.searchRead('legrand.muveletvegzes', [['create_uid', '=', store.user.user_id[0]]], [], 5)
+//        let result = await odoo.model.searchRead('legrand.muveletvegzes', [['create_uid', '=', store.user.user_id[0]]], [], 5)
+        let result = await odoo.model.searchRead('legrand.muveletvegzes', [['felvette_id', '=', store.user.user_id[0]]], [], 5)
         this.muveletvegzes = result.records
       } catch (e) {
         this.message = e.message
@@ -268,7 +267,7 @@ export default {
           if (result) {
             this.store.gyartasi_lap = result
           } else {
-            this.messageDolgozo = 'Érvénytelen dolgozó kód!'
+            this.message = 'Érvénytelen gyártási lap!'
           }
         } catch (e) {
           this.message = e.message
@@ -297,7 +296,7 @@ export default {
           if (result.length) {
             this.store.gylap_szefo_muvelet = result.records[0]
           } else {
-            this.messageDolgozo = 'Érvénytelen művelet!'
+            this.message = 'Érvénytelen művelet!'
           }
         } catch (e) {
           this.message = e.message

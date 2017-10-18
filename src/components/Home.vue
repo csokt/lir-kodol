@@ -26,7 +26,6 @@
 
 <script>
 import {store, odoo} from '../store'
-// import {HTTP} from '../http-common'
 import QrcodeReader from './QrcodeReader.vue'
 
 export default {
