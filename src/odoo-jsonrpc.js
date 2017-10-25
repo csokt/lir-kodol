@@ -99,9 +99,9 @@ var odooJsonrpc = (function () {
    */
   exposed.setHost = function (host) {
     // check scheme
-    if (/^https?:\/\//.test(host) === false) {
-      host = 'http://' + host
-    }
+//    if (/^https?:\/\//.test(host) === false) {
+//      host = 'http://' + host
+//    }
 
     internal.host = host
     return exposed
@@ -259,12 +259,14 @@ var odooJsonrpc = (function () {
    * @param array fields the fields to read
    * @return Promise
    */
-  exposed.model.searchRead = function (model, domain, fields = [], limit = null) {
+  exposed.model.searchRead = function (model, domain, fields = [], limit = null, sort = null, offset = null) {
     const params = {
       model: model,
       domain: domain,
       fields: fields,
-      limit: limit
+      limit: limit,
+      sort: sort,
+      offset: offset
     }
 
     return internal.sendRequest('/web/dataset/search_read', params)

@@ -21,7 +21,10 @@ var store = {
 // /////////////////////////////////////////////////////////////////////////
 import odoo from './odoo-jsonrpc'
 
-odoo.setHost('localhost:1337/localhost:8069')
+odoo.setHost('http://localhost:1337/localhost:8069')
+// odoo.setHost('https://localhost:443')
+// odoo.setHost('https://tibor.szefo.local:443')
+// odoo.setHost('.')
 
 odoo.login('raktar', 'hegedus.istvan', 'Godhak04').then(
   function (result) {

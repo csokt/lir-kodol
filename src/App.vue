@@ -17,6 +17,13 @@ export default {
     return {
       store: store
     }
+  },
+
+  created: function () {
+//    console.log('params:', this.$route.params)
+    console.log('route:', this.$route)
+//    console.log('this:', this)
+//    console.log('router.match:', router.match('/'))
   }
 }
 </script>
