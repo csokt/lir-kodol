@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import {store, odoo} from '../store'
+import odoo from '../odoo-jsonrpc'
+import {store} from '../store'
 import QrcodeReader from './QrcodeReader.vue'
 
 export default {
@@ -43,7 +44,7 @@ export default {
   methods: {
     async checkUser (value) {
       try {
-        let result = await odoo.model.searchRead('legrand.lir_user', [['qr', '=', value]], [])
+        let result = await odoo.model.searchRead('legrand.lir_user', [['qr', '=', parseInt(value)]], [])
         if (result.length) {
           this.store.user = result.records[0]
           this.scanUser = false
@@ -54,18 +55,6 @@ export default {
         this.messageUser = e.message
         console.log(e)
       }
-//      HTTP.get(`legrand_lir_user?limit=1&qr=eq.` + value)
-//      .then(response => {
-//        if (response.data.length) {
-//          this.store.user = response.data[0]
-//          this.scanUser = false
-//        } else {
-//          this.messageUser = 'Érvénytelen felhasználó kód!'
-//        }
-//      })
-//      .catch(e => {
-//        this.messageUser = e
-//      })
     }
   }
 }

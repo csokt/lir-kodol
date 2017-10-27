@@ -112,7 +112,8 @@
 -->
 
 <script>
-import {store, odoo} from '../store'
+import odoo from '../odoo-jsonrpc'
+import {store} from '../store'
 import Input from './Input.vue'
 import QrcodeReader from './QrcodeReader.vue'
 
@@ -165,44 +166,6 @@ export default {
         this.message = e.message
         console.log(e)
       }
-//      try {
-//        this.message = null
-//        this.mennyiseg = parseInt(this.mennyiseg)
-//        const teljesitettOra = (this.store.gylap_szefo_muvelet.osszes_ido + this.store.gylap_szefo_muvelet.beall_ido) * this.mennyiseg / this.store.gylap_szefo_muvelet.osszes_db
-//        await HTTP.post(`legrand_muveletvegzes`, {
-//          szefo_muvelet_id: this.store.gylap_szefo_muvelet.id,
-//          hely_id: this.store.user.hely_id,
-//          szemely_id: this.store.dolgozo.id,
-//          mennyiseg: this.mennyiseg,
-//          teljesitett_ora: teljesitettOra,
-//          megjegyzes: 'lir',
-//          nexon_azon: this.store.dolgozo.SzemelyId,
-//          create_uid: this.store.user.user_id,
-//          write_uid: this.store.user.user_id,
-//          create_date: new Date(),
-//          write_date: new Date()
-//        })
-//        const response = await HTTP.get(`legrand_gylap_szefo_muvelet?id=eq.` + this.store.gylap_szefo_muvelet.id)
-//        this.store.gylap_szefo_muvelet = response.data[0]
-//        let muvelet = this.store.gylap_szefo_muvelet
-//        muvelet.kesz_db += this.mennyiseg
-//        muvelet.elter_db += this.mennyiseg
-//        muvelet.kesz_ora += teljesitettOra
-//        muvelet.elter_ora += teljesitettOra
-//        await HTTP.patch(`legrand_gylap_szefo_muvelet?id=eq.` + muvelet.id, {
-//          kesz_db: muvelet.kesz_db,
-//          elter_db: muvelet.elter_db,
-//          kesz_ora: muvelet.kesz_ora,
-//          elter_ora: muvelet.elter_ora
-//        })
-//        this.selectMuveletvegzes()
-//        this.store.muveletszam = null
-//        this.store.gylap_szefo_muvelet = null
-//        this.mennyiseg = null
-//      } catch (e) {
-//        this.message = e.message
-//        console.log(e.response)
-//      }
     },
 
     async selectMuveletvegzes () {
@@ -214,22 +177,11 @@ export default {
         this.message = e.message
         console.log(e)
       }
-//      HTTP.get(`legrand_muveletvegzes?select=mennyiseg,create_date,muvelet:legrand_gylap_szefo_muvelet(id,name),dolgozo:nexon_szemely(id,name)&order=id.desc&limit=5&create_uid=eq.` + store.user.user_id)
-//      .then(response => {
-//        if (response.data.length) {
-//          this.muveletvegzes = response.data
-//        } else {
-//        }
-//      })
-//      .catch(e => {
-//        this.message = e.message
-//        console.log(e.response)
-//      })
     },
 
     async checkDolgozo (value) {
       try {
-        let result = await odoo.model.searchRead('nexon.szemely', [['SzemelyId', '=', value]])
+        let result = await odoo.model.searchRead('nexon.szemely', [['SzemelyId', '=', parseInt(value)]])
         if (result.length) {
           this.store.dolgozo = result.records[0]
           this.scanDolgozo = false
@@ -240,19 +192,6 @@ export default {
         this.messageDolgozo = e.message
         console.log(e)
       }
-//      HTTP.get(`nexon_szemely?limit=1&active&SzemelyId=eq.` + value)
-//      .then(response => {
-//        if (response.data.length) {
-//          this.store.dolgozo = response.data[0]
-//          this.scanDolgozo = false
-//        } else {
-//          this.messageDolgozo = 'Érvénytelen dolgozó kód!'
-//        }
-//      })
-//      .catch(e => {
-//        this.messageDolgozo = e.message
-//        console.log(e.response)
-//      })
     },
 
     async checkGyartasiLap () {
@@ -273,16 +212,6 @@ export default {
           this.message = e.message
           console.log(e)
         }
-//        HTTP.get(`legrand_gyartasi_lap?limit=1&active&id=eq.` + this.store.gyartasi_lap_id)
-//        .then(response => {
-//          if (response.data.length) {
-//            this.store.gyartasi_lap = response.data[0]
-//          }
-//        })
-//        .catch(e => {
-//          this.message = e.message
-//          console.log(e.response)
-//        })
       }
     },
 
@@ -302,16 +231,6 @@ export default {
           this.message = e.message
           console.log(e)
         }
-//        HTTP.get(`legrand_gylap_szefo_muvelet?limit=1&active&gyartasi_lap_id=eq.` + this.store.gyartasi_lap.id + `&muveletszam=eq.` + this.store.muveletszam)
-//        .then(response => {
-//          if (response.data.length) {
-//            this.store.gylap_szefo_muvelet = response.data[0]
-//          }
-//        })
-//        .catch(e => {
-//          this.message = e.message
-//          console.log(e.response)
-//        })
       }
     }
   }

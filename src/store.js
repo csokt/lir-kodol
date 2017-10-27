@@ -14,31 +14,7 @@ var store = {
   odooError: 'Kapcsolódás...'
 }
 
-// /////////////////////////////////////////////////////////////////////////
-//
-//                               odoo
-//
-// /////////////////////////////////////////////////////////////////////////
-import odoo from './odoo-jsonrpc'
-
-odoo.setHost('http://localhost:1337/localhost:8069')
-// odoo.setHost('https://localhost:443')
-// odoo.setHost('https://tibor.szefo.local:443')
-// odoo.setHost('.')
-
-odoo.login('raktar', 'hegedus.istvan', 'Godhak04').then(
-  function (result) {
-    store.odooConnected = true
-    store.odooError = ''
-    console.log('You are logged !')
-    console.log('Your UID is : ' + result.uid)
-  },
-  function (error) {
-    store.odooError = 'Nincs kapcsolat az adatbázissal!'
-    console.error(error)
-  }
-)
-export {store, odoo}
+export {store}
 
 // /////////////////////////////////////////////////////////////////////////
 //

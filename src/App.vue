@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import odoo from './odoo-jsonrpc'
 import {store} from './store'
 export default {
   name: 'app',
@@ -19,11 +20,25 @@ export default {
     }
   },
 
+// /////////////////////////////////////////////////////////////////////////
+//
+//                               odoo
+//
+// /////////////////////////////////////////////////////////////////////////
   created: function () {
-//    console.log('params:', this.$route.params)
-    console.log('route:', this.$route)
-//    console.log('this:', this)
-//    console.log('router.match:', router.match('/'))
+    let self = this
+    odoo.setHost('.')
+    const db = this.$route.query.db || 'szefo'
+    odoo.login(db, 'frontend', 'Szefo1953').then(
+      function (result) {
+        self.store.odooConnected = true
+        self.store.odooError = ''
+      },
+      function (error) {
+        self.store.odooError = 'Nincs kapcsolat az adatbázissal!'
+        console.error(error)
+      }
+    )
   }
 }
 </script>
